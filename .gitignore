@@ -75,3 +75,5 @@ typings/
 # Ignores anything with the containing .BAK
 # Example test.BAK.js || test.BAK || BAK (directory)
 *BAK*
+
+examples
