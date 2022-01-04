@@ -1,0 +1,7 @@
+{
+  "name": "kb-workflows-test",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Kevin Bost <kevbost@gmail.com>",
+  "license": "MIT"
+}
