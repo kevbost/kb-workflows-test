@@ -19,7 +19,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm config set '//npm.fontawesome.com/:_authToken' "${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}"
+          npm config set '//npm.fontawesome.com/:_authToken' "${{ secrets.FONT_AWESOME_NPM_AUTH_TOKEN }}"
           yarn install --immutable --immutable-cache --check-cache
         env:
           # FONT_AWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONT_AWESOME_NPM_AUTH_TOKEN }}
