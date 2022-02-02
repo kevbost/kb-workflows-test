@@ -18,7 +18,10 @@ jobs:
           scope: "@octocat"
 
       - name: Install dependencies
-        run: yarn
+        run: |
+          npm config set "@fortawesome:registry" https://npm.fontawesome.com/
+          npm config set '//npm.fontawesome.com/:_authToken' "${{ secrets.FONT_AWESOME_NPM_AUTH_TOKEN }}"
+          yarn
         env:
           FONT_AWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONT_AWESOME_NPM_AUTH_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
