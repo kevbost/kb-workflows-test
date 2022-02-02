@@ -18,11 +18,9 @@ jobs:
           scope: "@octocat"
 
       - name: Install dependencies
-        run: |
-          npm config set '//npm.fontawesome.com/:_authToken' "${{ secrets.FONT_AWESOME_NPM_AUTH_TOKEN }}"
-          yarn install --immutable --immutable-cache --check-cache
+        run: yarn
         env:
-          # FONT_AWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONT_AWESOME_NPM_AUTH_TOKEN }}
+          FONT_AWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONT_AWESOME_NPM_AUTH_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Cypress run
