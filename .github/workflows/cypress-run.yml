@@ -1,30 +1,103 @@
-name: Cypress Run Tests
+# name: Cypress Run Tests
+# on:
+#   pull_request:
+#     branches:
+#       - main
+# jobs:
+#   cypress-run:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+
+#       - name: Use Node.js ${{ matrix.node-version }}
+#         uses: actions/setup-node@v2
+#         with:
+#           always-auth: true
+#           node-version: "14.x"
+#           registry-url: https://registry.npmjs.org
+#           scope: "@octocat"
+
+#       - name: Install dependencies
+#         run: |
+#           npm config set "@fortawesome:registry" https://npm.fontawesome.com/
+#           npm config set '//npm.fontawesome.com/:_authToken' "${{ secrets.FONT_AWESOME_NPM_AUTH_TOKEN }}"
+#           yarn install --immutable --immutable-cache --check-cache
+#         env:
+#           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+#       - name: Cypress run
+#         run: npx cypress run --record --key 37348f37-8cd7-458b-8523-ca459ff6c74a
+#         # uses: cypress-io/github-action@v2
+
+name: Cypress Tests with installation job
+
 on:
   pull_request:
     branches:
       - main
+
 jobs:
-  cypress-run:
+  install:
     runs-on: ubuntu-latest
+    container: cypress/browsers:node12.18.3-chrome87-ff82
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+      - name: Save build folder
+        uses: actions/upload-artifact@v2
         with:
-          always-auth: true
-          node-version: "14.x"
-          registry-url: https://registry.npmjs.org
-          scope: "@octocat"
+          name: build
+          if-no-files-found: error
+          path: build
 
-      - name: Install dependencies
-        run: |
-          npm config set "@fortawesome:registry" https://npm.fontawesome.com/
-          npm config set '//npm.fontawesome.com/:_authToken' "${{ secrets.FONT_AWESOME_NPM_AUTH_TOKEN }}"
-          yarn install --immutable --immutable-cache --check-cache
+      - name: Cypress install
+        uses: cypress-io/github-action@v2
+        with:
+          # Disable running of tests within install job
+          install-command: |
+            npm config set "@fortawesome:registry" https://npm.fontawesome.com/
+            npm config set '//npm.fontawesome.com/:_authToken' "${{ secrets.FONT_AWESOME_NPM_AUTH_TOKEN }}"
+            yarn install --immutable --immutable-cache --check-cache
+          runTests: false
+          build: yarn build
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Cypress run
-        run: echo hi
-        # uses: cypress-io/github-action@v2
+  ui-chrome-tests:
+    runs-on: ubuntu-latest
+    container: cypress/browsers:node12.18.3-chrome87-ff82
+    needs: install
+    strategy:
+      fail-fast: false
+      matrix:
+        # run copies of the current job in parallel
+        containers: [1, 2, 3, 4, 5]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Download the build folders
+        uses: actions/download-artifact@v2
+        with:
+          name: build
+          path: build
+
+      - name: "UI Tests - Chrome"
+        uses: cypress-io/github-action@v2
+        with:
+          # we have already installed all dependencies above
+          install: false
+          start: yarn start
+          wait-on: "http://localhost:3000"
+          wait-on-timeout: 120
+          browser: chrome
+          record: true
+          parallel: true
+          group: "UI - Chrome"
+          spec: cypress/integration/*
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          # Recommended: pass the GitHub token lets this action correctly
+          # determine the unique run id necessary to re-run the checks
+          # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

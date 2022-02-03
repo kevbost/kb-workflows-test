@@ -24,12 +24,16 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "cypress:run": "cypress run",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
+    "globals": {
+      "cy": true
+    },
     "extends": [
       "react-app",
       "react-app/jest"
@@ -46,5 +50,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "cypress": "^9.4.1",
+    "start-server-and-test": "^1.14.0"
   }
 }
