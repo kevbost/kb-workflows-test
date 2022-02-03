@@ -7,7 +7,7 @@
 
 # testing
 /coverage
-cypress.json
+# cypress.json
 /cypress/integration/examples
 /cypress/videos/*
 /cypress/screenshots/*
